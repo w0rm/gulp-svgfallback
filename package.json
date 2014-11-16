@@ -1,0 +1,37 @@
+{
+  "name": "gulp-svgfallback",
+  "version": "0.0.0",
+  "description": "Generate png sprite from svg icons",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/w0rm/gulp-svgfallback.git"
+  },
+  "keywords": [
+    "gulpplugin",
+    "svg",
+    "png",
+    "fallback",
+    "sprite"
+  ],
+  "author": {
+    "name": "Andrey Kuzmin",
+    "email": "unsoundscapes@gmail.com"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/w0rm/gulp-svgfallback/issues"
+  },
+  "homepage": "https://github.com/w0rm/gulp-svgfallback",
+  "dependencies": {
+    "gulp-util": "^3.0.1",
+    "lodash": "^2.4.1",
+    "phridge": "^1.0.7",
+    "through2": "^0.6.3"
+  },
+  "devDependencies": {
+    "gulp": "^3.8.10",
+    "gulp-rename": "^1.2.0",
+    "lodash.template": "^2.4.1"
+  }
+}

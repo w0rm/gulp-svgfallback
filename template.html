@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+    body {
+      margin: 0;
+    }
+    .svgs,
+    .svg,
+    svg {
+      float: left;
+    }
+    </style>
+</head>
+<body>
+    <div class="svgs">
+        <% _.each(svgs, function (svg) { %>
+            <div class="svg"><%= svg %></div>
+        <% }) %>
+    </div>
+</body>
+</html>
