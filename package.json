@@ -30,8 +30,6 @@
     "through2": "^0.6.3"
   },
   "devDependencies": {
-    "gulp": "^3.8.10",
-    "gulp-rename": "^1.2.0",
-    "lodash.template": "^2.4.1"
+    "gulp": "^3.8.10"
   }
 }
