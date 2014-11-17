@@ -5,14 +5,18 @@ var _ = require('lodash')
 var phridge = require('phridge')
 var fs = require('fs')
 
+
 module.exports = function (options) {
 
   options = options || {}
 
-  var htmlTemplate = options.htmlTemplate || path.join(__dirname, 'template.html')
-  var cssTemplate = options.cssTemplate || path.join(__dirname, 'template.css')
+  var spriteTemplate = options.spriteTemplate ||
+                       path.join(__dirname, 'templates', 'sprite.html')
+  var cssTemplate = options.cssTemplate ||
+                    path.join(__dirname, 'templates', 'style.css')
   var pngFileName = options.pngFileName || 'svgfallback.png'
   var cssFileName = options.cssFileName || 'svgfallback.css'
+  var backgroundUrl = options.backgroundUrl || pngFileName
   var prefix = options.prefix || ''
   var svgs = []
 
@@ -35,7 +39,7 @@ module.exports = function (options) {
 
       if (svgs.length === 0) return cb()
 
-      renderTemplate(htmlTemplate, {icons: svgs}, function (err, html) {
+      renderTemplate(spriteTemplate, {icons: svgs}, function (err, html) {
         if (err) {
           return cb(new gutil.PluginError('gulp-svgfallback', err))
         }
@@ -72,8 +76,13 @@ module.exports = function (options) {
               path: pngFileName
             , contents: new Buffer(result.img, 'base64')
             })
+            var cssOptions = {
+              backgroundUrl: backgroundUrl
+            , icons: result.icons
+            , prefix: prefix
+            }
             self.push(pngFile)
-            renderTemplate(cssTemplate, {icons: result.icons, prefix: prefix}, function (err, css) {
+            renderTemplate(cssTemplate, cssOptions, function (err, css) {
               if (err) {
                 return cb(new gutil.PluginError('gulp-svgfallback', err))
               }
