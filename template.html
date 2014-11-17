@@ -5,17 +5,19 @@
     body {
       margin: 0;
     }
-    .svgs,
-    .svg,
+    .icons,
+    .icon,
     svg {
       float: left;
     }
     </style>
 </head>
 <body>
-    <div class="svgs">
-        <% _.each(svgs, function (svg) { %>
-            <div class="svg"><%= svg %></div>
+    <div class="icons">
+        <% icons.forEach(function (icon) { %>
+            <div class="icon" data-name="<%- icon.name %>">
+                <%= icon.content %>
+            </div>
         <% }) %>
     </div>
 </body>

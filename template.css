@@ -1,0 +1,7 @@
+<% icons.forEach(function (icon) { %>
+.<%- prefix %><%- icon.name %> {
+  background-position: <%- -icon.left %>px <%- -icon.top %>px;
+  width: <%- icon.width %>px;
+  height: <%- icon.height %>px;
+}
+<% }) %>

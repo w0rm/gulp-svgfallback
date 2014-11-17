@@ -13,6 +13,7 @@ module.exports = function (options) {
   var cssTemplate = options.cssTemplate || path.join(__dirname, 'template.css')
   var pngFileName = options.pngFileName || 'svgfallback.png'
   var cssFileName = options.cssFileName || 'svgfallback.css'
+  var prefix = options.prefix || ''
   var svgs = []
 
   return through2.obj(
@@ -21,7 +22,10 @@ module.exports = function (options) {
       if (file.isStream()) {
         return cb(new gutil.PluginError('gulp-svgstore', 'Streams are not supported!'))
       }
-      svgs.push(file.contents.toString('utf8'))
+      svgs.push({
+        content: file.contents.toString('utf8')
+      , name: path.basename(file.relative, path.extname(file.relative))
+      })
       cb()
     }
 
@@ -31,7 +35,7 @@ module.exports = function (options) {
 
       if (svgs.length === 0) return cb()
 
-      renderTemplate(htmlTemplate, {svgs: svgs}, function (err, html) {
+      renderTemplate(htmlTemplate, {icons: svgs}, function (err, html) {
         if (err) {
           return cb(new gutil.PluginError('gulp-svgfallback', err))
         }
@@ -40,26 +44,28 @@ module.exports = function (options) {
           .then(function (phantom) {
             return phantom
               .run(html, function (html, resolve) {
-                var rects
+                var icons
                 var rect
                 var page = webpage.create()
                 page.content = html
                 rect = page.evaluate(function () {
-                  return document.querySelector('.svgs').getBoundingClientRect()
+                  return document.querySelector('.icons').getBoundingClientRect()
                 })
-                rects = page.evaluate(function () {
-                  var all = document.querySelectorAll('.svg')
+                icons = page.evaluate(function () {
+                  var all = document.querySelectorAll('.icon')
                   return [].map.call(all, function (el) {
-                    return el.getBoundingClientRect()
+                    var result = el.getBoundingClientRect()
+                    result.name = el.getAttribute('data-name')
+                    return result
                   })
                 })
                 page.clipRect = rect
                 resolve({
                   img: page.renderBase64('PNG')
-                , rects: rects
+                , icons: icons
                 })
               })
-              .finally(phridge.disposeAll)
+              .finally(phantom.dispose.bind(phantom))
           })
           .done(function (result) {
             var pngFile = new gutil.File({
@@ -67,7 +73,17 @@ module.exports = function (options) {
             , contents: new Buffer(result.img, 'base64')
             })
             self.push(pngFile)
-            cb()
+            renderTemplate(cssTemplate, {icons: result.icons, prefix: prefix}, function (err, css) {
+              if (err) {
+                return cb(new gutil.PluginError('gulp-svgfallback', err))
+              }
+              var cssFile = new gutil.File({
+                path: cssFileName
+              , contents: new Buffer(css)
+              })
+              self.push(cssFile)
+              cb()
+            })
           }, function (err) {
             cb(new gutil.PluginError('gulp-svgfallback', err))
           })
