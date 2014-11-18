@@ -20,8 +20,8 @@ Generate png sprite from svg icons
 The following task will output png file and css file:
 
 ```js
-var svgfallback = require('./index')
-var gulp = require('gulp')
+var svgfallback = require('gulp-svgfallback');
+var gulp = require('gulp');
 
 gulp.task('svg', function () {
     return gulp
@@ -31,8 +31,8 @@ gulp.task('svg', function () {
             cssFileName: 'sprite.css',
             prefix: 'icon-'
         }))
-        .pipe(gulp.dest('dest'))
-})
+        .pipe(gulp.dest('dest'));
+});
 ```
 
 ### Custom templates
