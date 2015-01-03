@@ -12,8 +12,7 @@ Generate png sprite from svg icons
 * backgroundUrl — url of background image, default: options.pngFileName
 * prefix — prefix for classNames, default: ''
 * cssTemplate — path to custom CSS lodash template, default: 'template.css'
-* spriteTemplate — path to custom HTML lodash template,
-  that is used to render the sprite, default: 'template.html'
+* spriteWidth — maximum width of the sprite, default: 400
 
 ## Usage
 

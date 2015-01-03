@@ -6,17 +6,18 @@ var phridge = require('phridge')
 var fs = require('fs')
 var when = require('when')
 
+var SPRITE_TEMPLATE = path.join(__dirname, 'templates', 'sprite.html')
 
 module.exports = function (options) {
 
-  options = options || {}
-
-  var spriteTemplate = options.spriteTemplate || path.join(__dirname, 'templates', 'sprite.html')
-  var cssTemplate = options.cssTemplate || path.join(__dirname, 'templates', 'style.css')
-  var pngFileName = options.pngFileName || 'svgfallback.png'
-  var cssFileName = options.cssFileName || 'svgfallback.css'
-  var backgroundUrl = options.backgroundUrl || pngFileName
-  var prefix = options.prefix || ''
+  var opts = _.extend({
+    cssTemplate: path.join(__dirname, 'templates', 'style.css')
+  , pngFileName: 'svgfallback.png'
+  , cssFileName: 'svgfallback.css'
+  , backgroundUrl: 'svgfallback.png'
+  , spriteWidth: 400
+  , prefix: ''
+  }, options)
   var svgs = []
 
   return through2.obj(
@@ -38,26 +39,29 @@ module.exports = function (options) {
 
       if (svgs.length === 0) return cb()
 
-      renderTemplate(spriteTemplate, {icons: svgs})
+      renderTemplate(SPRITE_TEMPLATE, {icons: svgs})
+        .then(function (html) {
+          return { html: html, spriteWidth: opts.spriteWidth }
+        })
         .then(generateSprite)
         .then(function (sprite) {
 
           self.push(new gutil.File({
-            path: pngFileName
+            path: opts.pngFileName
           , contents: new Buffer(sprite.img, 'base64')
           }))
 
-          return renderTemplate(cssTemplate, {
-            backgroundUrl: backgroundUrl
+          return renderTemplate(opts.cssTemplate, {
+            backgroundUrl: opts.backgroundUrl
           , icons: sprite.icons
-          , prefix: prefix
+          , prefix: opts.prefix
           })
 
         })
         .done(
           function (css) {
             self.push(new gutil.File({
-              path: cssFileName
+              path: opts.cssFileName
             , contents: new Buffer(css)
             }))
             cb()
@@ -85,15 +89,16 @@ function renderTemplate (fileName, options) {
 }
 
 
-function generateSprite (html) {
+function generateSprite (opts) {
   return phridge.spawn()
     .then(function (phantom) {
       return phantom
-        .run(html, function (html, resolve) {
+        .run(opts, function (opts, resolve) {
           var icons
           var rect
           var page = webpage.create()  // jshint ignore: line
-          page.content = html
+          page.viewportSize = { width: opts.spriteWidth, height: 1 }
+          page.content = opts.html
           rect = page.evaluate(function () {
             return document.querySelector('.icons').getBoundingClientRect()
           })
