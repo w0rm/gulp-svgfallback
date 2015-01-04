@@ -1,4 +1,4 @@
-gulp-svgfallback
+gulp-svgfallback [![Build Status](https://api.travis-ci.org/w0rm/gulp-svgfallback.png)](https://travis-ci.org/w0rm/gulp-svgfallback)
 ================
 
 Generate png sprite from svg icons
