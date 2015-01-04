@@ -3,6 +3,9 @@
   "version": "0.0.0",
   "description": "Generate png sprite from svg icons",
   "main": "index.js",
+  "scripts": {
+    "test": "gulp test"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/w0rm/gulp-svgfallback.git"
@@ -31,6 +34,9 @@
     "when": "^3.6.4"
   },
   "devDependencies": {
-    "gulp": "^3.8.10"
+    "gulp": "^3.8.10",
+    "gulp-mocha": "^2.0.0",
+    "image-size": "^0.3.5",
+    "sinon": "^1.12.2"
   }
 }

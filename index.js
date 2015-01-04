@@ -112,9 +112,13 @@ function phantomScript (opts, resolve) {
   icons = page.evaluate(function () {
     var all = document.querySelectorAll('.icon')
     return [].map.call(all, function (el) {
-      var result = el.getBoundingClientRect()
-      result.name = el.getAttribute('data-name')
-      return result
+      var rect = el.getBoundingClientRect()
+      return { name: el.getAttribute('data-name')
+             , width: rect.width
+             , height: rect.height
+             , left: rect.left
+             , top: rect.top
+             }
     })
   })
   resolve({ img: page.renderBase64('PNG'), icons: icons })
