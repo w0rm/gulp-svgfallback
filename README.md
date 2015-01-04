@@ -3,8 +3,6 @@ gulp-svgfallback [![Build Status](https://api.travis-ci.org/w0rm/gulp-svgfallbac
 
 Generate png sprite from svg icons
 
-**Please note** that this is still in development and the code is a bit messy.
-
 ## Options
 
 * pngFileName — name of output png file, default: 'svgfallback.png'
