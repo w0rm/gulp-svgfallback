@@ -22,7 +22,7 @@ The following task will output png file and css file:
 var svgfallback = require('gulp-svgfallback');
 var gulp = require('gulp');
 
-gulp.task('svg', function () {
+gulp.task('svgfallback', function () {
     return gulp
         .src('src/*.svg')
         .pipe(svgfallback({
@@ -34,9 +34,32 @@ gulp.task('svg', function () {
 });
 ```
 
-### Custom templates
+## Custom css template
 
-Two additional options `cssTemplate` and `spriteTemplate` allow you
-to override templates that are used to generate output css, or html source of
-the sprite respectively. For more info, please check the default templates
-in 'templates/' directory of this project.
+An additional option `cssTemplate` allows you to override template that is used to generate css.
+For more info, please check the default template in 'templates/style.css'.
+
+Here is an example of data that is passed to css template:
+
+```json
+{
+    "backgroundUrl": "sprite.png",
+    "prefix": "icon-",
+    "icons": [
+        {
+            "name": "circle",
+            "width": 40,
+            "height": 40,
+            "left": 0,
+            "top": 0
+        },
+        {
+            "name": "square",
+            "width": 40,
+            "height": 40,
+            "left": 40,
+            "top": 0
+        }
+    ]
+}
+```
