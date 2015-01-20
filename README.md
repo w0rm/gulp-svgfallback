@@ -1,7 +1,11 @@
 gulp-svgfallback [![Build Status](https://api.travis-ci.org/w0rm/gulp-svgfallback.png)](https://travis-ci.org/w0rm/gulp-svgfallback)
 ================
 
-Generate png sprite from svg icons
+Generate png sprite from svg sources.
+
+1. Runs phantomjs *only once* for all svg sources
+2. Doesn't create any temporary files
+3. Allows to use custom CSS template
 
 ## Options
 
