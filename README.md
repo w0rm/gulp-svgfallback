@@ -61,3 +61,55 @@ Here is an example of data that is passed to css template:
     ]
 }
 ```
+
+## Add variations
+
+To add variations (e.g. different colors) into your sprite,
+you can combine gulp-svgfallback with other gulp plugins.
+
+The following task will add `.circle-red` and `.circle-blue` into your sprite.
+
+```js
+var path = require('path');
+var gulp = require('gulp');
+var gulpif = require('gulp-if');
+var lazypipe = require('lazypipe');
+var clone = require('gulp-clone');
+var cheerio = require('gulp-cheerio');
+var rename = require('gulp-rename');
+var svgfallback = require('gulp-svgfallback');
+
+function isCircle (file) {
+    return path.basename(file.relative) === 'circle.svg';
+}
+
+function colorize (color) {
+    var sink;
+    return (lazypipe()
+        .pipe(function () {
+            sink = clone.sink();
+            return sink;
+        })
+        .pipe(cheerio, function ($) {
+            $('svg').attr('fill', color);
+        })
+        .pipe(rename, {suffix: '-' + color})
+        .pipe(function () {
+            return sink.tap();
+        })
+    )();
+}
+
+gulp.task('svgfallback', function () {
+    return gulp.src('src/*.svg')
+        .pipe(gulpif(isCircle, colorize('red')))
+        .pipe(gulpif(isCircle, colorize('blue')))
+        .pipe(svgfallback())
+        .pipe(gulp.dest('dest'));
+});
+```
+
+## Changelog
+
+* 1.0.1 Added example of how to add variations
+* 1.0.0 Initial release
