@@ -14,9 +14,9 @@
 </head>
 <body>
     <div class="icons">
-        <% icons.forEach(function (icon) { %>
-            <div class="icon" data-name="<%- icon.name %>">
-                <%= icon.content %>
+        <% _.each(icons, function (icon, name) { %>
+            <div class="icon" data-name="<%- name %>">
+                <%= icon %>
             </div>
         <% }) %>
     </div>

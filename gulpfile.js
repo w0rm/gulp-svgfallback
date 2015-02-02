@@ -4,7 +4,7 @@ var mocha = require('gulp-mocha')
 
 gulp.task('svgfallback', function () {
   return gulp
-    .src('test/src/*.svg')
+    .src('test/src/icons/*.svg', {base: 'test/src/icons'})
     .pipe(svgfallback())
     .pipe(gulp.dest('test/dest'))
 })

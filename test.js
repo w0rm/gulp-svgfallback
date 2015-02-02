@@ -24,15 +24,54 @@ describe('gulp-svgfallback', function () {
     sandbox.restore()
   })
 
-  it('should output two files, png and css', function (done) {
+
+  it('should output two files, png and css, named with base path of the first file', function (done) {
 
     var stream = svgfallback()
     var files = []
 
     stream.on('data', files.push.bind(files))
 
-    stream.write(new gutil.File({ contents: new Buffer(CIRCLE), path: 'circle.svg' }))
-    stream.write(new gutil.File({ contents: new Buffer(SQUARE), path: 'square.svg' }))
+    stream.write(new gutil.File({
+      contents: new Buffer(CIRCLE)
+    , path: 'src/icons/circle.svg'
+    , base: 'src/icons'
+    }))
+    stream.write(new gutil.File({
+      contents: new Buffer(SQUARE)
+    , path: 'src2/icons2/square.svg'
+    , base: 'src2/icons2'
+    }))
+
+    stream.on('end', function () {
+      assert.ok(files.length === 2)
+      assert.ok(files[0].path === 'icons.png')
+      assert.ok(files[1].path === 'icons.css')
+      done()
+    })
+
+    stream.end()
+
+  })
+
+
+  it('should name result files svgfallback by default if base path of the first file is missing', function (done) {
+
+    var stream = svgfallback()
+    var files = []
+
+    stream.on('data', files.push.bind(files))
+
+    stream.write(new gutil.File({
+      contents: new Buffer(CIRCLE)
+    , path: 'circle.svg'
+    , base: '.'
+    }))
+    stream.write(new gutil.File({
+      contents: new Buffer(SQUARE)
+    , path: 'square.svg'
+    , base: '.'
+    }))
 
     stream.on('end', function () {
       assert.ok(files.length === 2)
@@ -42,6 +81,24 @@ describe('gulp-svgfallback', function () {
     })
 
     stream.end()
+
+  })
+
+
+  it('should emit error if files have the same name', function (done) {
+
+      var stream = svgfallback()
+
+      stream.on('error', function (error) {
+        assert.ok(error instanceof gutil.PluginError);
+        assert.equal(error.message, 'File name should be unique: circle')
+        done()
+      })
+
+      stream.write(new gutil.File({ contents: new Buffer('<svg></svg>'), path: 'circle.svg' }))
+      stream.write(new gutil.File({ contents: new Buffer('<svg></svg>'), path: 'circle.svg' }))
+
+      stream.end()
 
   })
 
@@ -107,7 +164,11 @@ describe('gulp-svgfallback', function () {
 
     for(var i = 0; i < 10; i++) {
       // Each svg is 40px size
-      stream.write(new gutil.File({ contents: new Buffer(CIRCLE), path: 'file.svg' }))
+      stream.write(new gutil.File({
+        contents: new Buffer(CIRCLE)
+      , path: 'file' + i + '.svg'
+      , base: '.'
+      }))
     }
 
     stream.on('data', files.push.bind(files))
@@ -131,8 +192,8 @@ describe('gulp-svgfallback', function () {
 
     stream.on('data', function () {})
 
-    stream.write(new gutil.File({ contents: new Buffer(CIRCLE), path: 'circle.svg' }))
-    stream.write(new gutil.File({ contents: new Buffer(SQUARE), path: 'square.svg' }))
+    stream.write(new gutil.File({ contents: new Buffer(CIRCLE), path: 'circle.svg', base: '.' }))
+    stream.write(new gutil.File({ contents: new Buffer(SQUARE), path: 'square.svg', base: '.' }))
 
     stream.on('end', function () {
 
@@ -141,10 +202,7 @@ describe('gulp-svgfallback', function () {
 
       // first call for sprite template
       assert.deepEqual(spy.getCall(0).args[1], {
-        icons: [
-          { name: 'circle', content: CIRCLE }
-        , { name: 'square', content: SQUARE }
-        ]
+        icons: {circle: CIRCLE, square: SQUARE }
       })
 
       // second call for css template
@@ -154,7 +212,6 @@ describe('gulp-svgfallback', function () {
           { name: 'circle', width: 40, height: 40, left: 0, top: 0 }
         , { name: 'square', width: 40, height: 40, left: 40, top: 0 }
         ]
-      , prefix: ''
       })
 
       done()
