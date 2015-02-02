@@ -10,17 +10,14 @@ var SPRITE_TEMPLATE = path.join(__dirname, 'templates', 'sprite.html')
 
 module.exports = function (options) {
 
-  var svgs = []
+  var svgs = {}
+  var fileName
   var opts = _.extend({
     cssTemplate: path.join(__dirname, 'templates', 'style.css')
-  , pngFileName: 'svgfallback.png'
-  , cssFileName: 'svgfallback.css'
   , backgroundUrl: false
   , spriteWidth: 400
-  , prefix: ''
   }, options)
 
-  if (!opts.backgroundUrl) opts.backgroundUrl = opts.pngFileName
 
   return through2.obj(
 
@@ -28,10 +25,23 @@ module.exports = function (options) {
       if (file.isStream()) {
         return cb(new gutil.PluginError('gulp-svgfallback', 'Streams are not supported!'))
       }
-      svgs.push({
-        content: file.contents.toString()
-      , name: path.basename(file.relative, path.extname(file.relative))
-      })
+
+      var name = path.basename(file.relative, path.extname(file.relative))
+
+      if (!fileName) {
+        fileName = path.basename(file.base)
+        if (fileName === '.' || !fileName) {
+          fileName = 'svgfallback'
+        } else {
+          fileName = fileName.split(path.sep).shift()
+        }
+      }
+
+      if (name in svgs) {
+        return cb(new gutil.PluginError('gulp-svgfallback', 'File name should be unique: ' + name))
+      }
+
+      svgs[name] = file.contents.toString()
       cb()
     }
 
@@ -39,7 +49,7 @@ module.exports = function (options) {
 
       var self = this
 
-      if (svgs.length === 0) return cb()
+      if (Object.keys(svgs).length === 0) return cb()
 
       renderTemplate(SPRITE_TEMPLATE, {icons: svgs})
         .then(function (html) {
@@ -49,21 +59,20 @@ module.exports = function (options) {
         .then(function (sprite) {
 
           self.push(new gutil.File({
-            path: opts.pngFileName
+            path: fileName + '.png'
           , contents: new Buffer(sprite.img, 'base64')
           }))
 
           return renderTemplate(opts.cssTemplate, {
-            backgroundUrl: opts.backgroundUrl
+            backgroundUrl: opts.backgroundUrl || fileName + '.png'
           , icons: sprite.icons
-          , prefix: opts.prefix
           })
 
         })
         .done(
           function (css) {
             self.push(new gutil.File({
-              path: opts.cssFileName
+              path: fileName + '.css'
             , contents: new Buffer(css)
             }))
             cb()

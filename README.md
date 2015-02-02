@@ -9,16 +9,20 @@ Generate png sprite from svg sources.
 
 ## Options
 
-* pngFileName — name of output png file, default: 'svgfallback.png'
-* cssFileName — name of output css file, default: 'svgfallback.css'
-* backgroundUrl — url of background image, default: options.pngFileName
-* prefix — prefix for classNames, default: ''
-* cssTemplate — path to custom CSS lodash template, default: 'template.css'
-* spriteWidth — maximum width of the sprite, default: 400
+* backgroundUrl — url of background image, is set to output png fileName by default;
+* cssTemplate — path to custom CSS lodash template;
+* spriteWidth — maximum width of the sprite, `default: 400`.
+
+**Automatic options**:
+
+* css class of each icon is set to the name of corresponding file;
+* output png and css filenames are set to the name of base directory of the first file.
+
+If your workflow is different, please use `gulp-rename` to rename sources or result files.
 
 ## Usage
 
-The following task will output png file and css file:
+The following task will output icons.png and icons.css:
 
 ```js
 var svgfallback = require('gulp-svgfallback');
@@ -26,12 +30,8 @@ var gulp = require('gulp');
 
 gulp.task('svgfallback', function () {
     return gulp
-        .src('src/*.svg')
-        .pipe(svgfallback({
-            pngFileName: 'sprite.png',
-            cssFileName: 'sprite.css',
-            prefix: 'icon-'
-        }))
+        .src('src/icons/*.svg', {base: 'src/icons'})
+        .pipe(svgfallback())
         .pipe(gulp.dest('dest'));
 });
 ```
@@ -46,7 +46,6 @@ Here is an example of data that is passed to css template:
 ```json
 {
     "backgroundUrl": "sprite.png",
-    "prefix": "icon-",
     "icons": [
         {
             "name": "circle",
@@ -64,6 +63,47 @@ Here is an example of data that is passed to css template:
         }
     ]
 }
+```
+
+## Custom css classes
+
+If you need to add prefix to each css class, please use `gulp-rename`:
+
+```js
+var gulp = require('gulp');
+var rename = require('gulp-rename');
+var svgfallback = require('gulp-svgfallback');
+
+gulp.task('default', function () {
+    return gulp
+        .src('src/icons/*.svg', {base: 'src/icons'})
+        .pipe(rename({prefix: 'icon-'})
+        .pipe(svgfallback())
+        .pipe(gulp.dest('dest'));
+});
+```
+
+Since css class for each icon should be unique, you cannot pass files with the same name.
+If you need to have nested directories that may have files with the same name, please
+use `gulp-rename`. The following example will concatenate relative path with the name of the file,
+e.g. `src/icons/one/two/three/circle.svg` becomes `one-two-three-circle`.
+
+```js
+var gulp = require('gulp');
+var rename = require('gulp-rename');
+var svgfallback = require('gulp-svgfallback');
+
+gulp.task('default', function () {
+    return gulp
+        .src('src/icons/**/*.svg', {base: 'src/icons'})
+        .pipe(rename(function (path) {
+            var name = path.dirname.split(path.sep);
+            name.push(path.basename);
+            path.basename = name.join('-');
+        }))
+        .pipe(svgfallback())
+        .pipe(gulp.dest('dest'));
+});
 ```
 
 ## Add variations
@@ -105,7 +145,8 @@ function colorize (color) {
 }
 
 gulp.task('svgfallback', function () {
-    return gulp.src('src/*.svg')
+    return gulp
+        .src('src/icons/*.svg', {base: 'src/icons'})
         .pipe(gulpif(isCircle, colorize('red')))
         .pipe(gulpif(isCircle, colorize('blue')))
         .pipe(svgfallback())
