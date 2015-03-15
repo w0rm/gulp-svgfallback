@@ -4,7 +4,7 @@
   "description": "Generate png sprite from svg icons",
   "main": "index.js",
   "scripts": {
-    "test": "gulp test"
+    "test": "mocha test.js -t 3000"
   },
   "repository": {
     "type": "git",
@@ -35,8 +35,8 @@
   },
   "devDependencies": {
     "gulp": "^3.8.10",
-    "gulp-mocha": "^2.0.0",
     "image-size": "^0.3.5",
+    "mocha": "^2.2.1",
     "sinon": "^1.12.2"
   }
 }
