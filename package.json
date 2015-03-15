@@ -1,6 +1,6 @@
 {
   "name": "gulp-svgfallback",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Generate png sprite from svg icons",
   "main": "index.js",
   "scripts": {
