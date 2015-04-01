@@ -36,6 +36,10 @@ gulp.task('svgfallback', function () {
 });
 ```
 
+## Caveats
+
+Please ensure that svg sources have with and height: these dimensions will be used to generate png sprite.
+
 ## Custom css template
 
 An additional option `cssTemplate` allows you to override template that is used to generate css.
