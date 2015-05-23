@@ -187,8 +187,15 @@ describe('gulp-svgfallback', function () {
 
   it('should pass correct data into templating functions', function (done) {
 
-    var spy = sandbox.spy(_, 'template')
+    var spy = sandbox.spy()
     var stream = svgfallback()
+    var original = _.template
+    sandbox.stub(_, 'template', function (template) {
+      return function (opts) {
+        spy(template, opts)
+        return original.call(_, template)(opts)
+      }
+    })
 
     stream.on('data', function () {})
 

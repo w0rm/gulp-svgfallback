@@ -160,6 +160,7 @@ gulp.task('svgfallback', function () {
 
 ## Changelog
 
+* 3.0.2 Update direct dependencies
 * 3.0.1 Reduced dev dependencies
 * 2.0.0 Reduced amount of options, improved readme
 * 1.0.1 Added example of how to add variations

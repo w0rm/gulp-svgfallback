@@ -91,7 +91,7 @@ function renderTemplate (fileName, options) {
     fs.readFile(fileName, function (err, template) {
       if (err) return reject(err)
       try {
-        resolve(_.template(template, options))
+        resolve(_.template(template)(options))
       } catch (err) {
         reject(err)
       }
