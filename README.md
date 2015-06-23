@@ -11,7 +11,7 @@ Generate png sprite from svg sources.
 2. Doesn't create any temporary files
 3. Allows to use custom CSS template
 
-## Options
+### Options
 
 * backgroundUrl — url of background image, is set to output png fileName by default;
 * cssTemplate — path to custom CSS lodash template;
