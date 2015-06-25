@@ -69,10 +69,11 @@ module.exports = function (options) {
       })
       .done(
         function (css) {
-          cb(null, self.push(new gutil.File({
+          self.push(new gutil.File({
             path: fileName + '.css'
           , contents: new Buffer(css)
-          })))
+          }))
+          cb()
         }
       , function (err) {
           setImmediate(function () {
