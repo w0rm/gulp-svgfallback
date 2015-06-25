@@ -1,5 +1,5 @@
 var path = require('path')
-var through2 = require('through2')
+var Stream = require('stream')
 var gutil = require('gulp-util')
 var _ = require('lodash')
 var phridge = require('phridge')
@@ -17,72 +17,72 @@ module.exports = function (options) {
   , backgroundUrl: false
   , spriteWidth: 400
   }, options)
+  var stream = new Stream.Transform({objectMode: true})
 
+  stream._transform = function transform (file, encoding, cb) {
+    if (file.isStream()) {
+      return cb(new gutil.PluginError('gulp-svgfallback', 'Streams are not supported!'))
+    }
 
-  return through2.obj(
+    var name = path.basename(file.relative, path.extname(file.relative))
 
-    function transform (file, encoding, cb) {
-      if (file.isStream()) {
-        return cb(new gutil.PluginError('gulp-svgfallback', 'Streams are not supported!'))
+    if (!fileName) {
+      fileName = path.basename(file.base)
+      if (fileName === '.' || !fileName) {
+        fileName = 'svgfallback'
+      } else {
+        fileName = fileName.split(path.sep).shift()
       }
+    }
 
-      var name = path.basename(file.relative, path.extname(file.relative))
+    if (name in svgs) {
+      return cb(new gutil.PluginError('gulp-svgfallback', 'File name should be unique: ' + name))
+    }
 
-      if (!fileName) {
-        fileName = path.basename(file.base)
-        if (fileName === '.' || !fileName) {
-          fileName = 'svgfallback'
-        } else {
-          fileName = fileName.split(path.sep).shift()
+    svgs[name] = file.contents.toString()
+    cb()
+  }
+
+  stream._flush = function flush (cb) {
+
+    var self = this
+
+    if (Object.keys(svgs).length === 0) return cb()
+
+    renderTemplate(SPRITE_TEMPLATE, {icons: svgs})
+      .then(function (html) {
+        return { html: html, spriteWidth: opts.spriteWidth }
+      })
+      .then(generateSprite)
+      .then(function (sprite) {
+
+        self.push(new gutil.File({
+          path: fileName + '.png'
+        , contents: new Buffer(sprite.img, 'base64')
+        }))
+
+        return renderTemplate(opts.cssTemplate, {
+          backgroundUrl: opts.backgroundUrl || fileName + '.png'
+        , icons: sprite.icons
+        })
+
+      })
+      .done(
+        function (css) {
+          cb(null, self.push(new gutil.File({
+            path: fileName + '.css'
+          , contents: new Buffer(css)
+          })))
         }
-      }
-
-      if (name in svgs) {
-        return cb(new gutil.PluginError('gulp-svgfallback', 'File name should be unique: ' + name))
-      }
-
-      svgs[name] = file.contents.toString()
-      cb()
-    }
-
-  , function flush (cb) {
-
-      var self = this
-
-      if (Object.keys(svgs).length === 0) return cb()
-
-      renderTemplate(SPRITE_TEMPLATE, {icons: svgs})
-        .then(function (html) {
-          return { html: html, spriteWidth: opts.spriteWidth }
-        })
-        .then(generateSprite)
-        .then(function (sprite) {
-
-          self.push(new gutil.File({
-            path: fileName + '.png'
-          , contents: new Buffer(sprite.img, 'base64')
-          }))
-
-          return renderTemplate(opts.cssTemplate, {
-            backgroundUrl: opts.backgroundUrl || fileName + '.png'
-          , icons: sprite.icons
-          })
-
-        })
-        .done(
-          function (css) {
-            self.push(new gutil.File({
-              path: fileName + '.css'
-            , contents: new Buffer(css)
-            }))
-            cb()
-          }
-        , function (err) {
+      , function (err) {
+          setImmediate(function () {
             cb(new gutil.PluginError('gulp-svgfallback', err))
-          }
-        )
-    }
-  )
+          })
+        }
+      )
+  }
+
+  return stream;
 }
 
 

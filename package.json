@@ -30,7 +30,6 @@
     "gulp-util": "^3.0.1",
     "lodash": "^3.9.1",
     "phridge": "^1.1.0",
-    "through2": "^0.6.3",
     "when": "^3.7.3"
   },
   "devDependencies": {
