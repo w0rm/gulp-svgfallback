@@ -42,7 +42,7 @@ gulp.task('svgfallback', function () {
 
 ## Caveats
 
-Please ensure that svg sources have with and height: these dimensions will be used to generate png sprite.
+Please ensure that svg sources have width and height: these dimensions will be used to generate png sprite.
 
 ## Custom css template
 
