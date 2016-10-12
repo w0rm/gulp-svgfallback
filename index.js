@@ -104,7 +104,7 @@ function generateSprite (opts) {
     .then(function (phantom) {
       return phantom
         .run(opts, phantomScript)
-            .then((res) => {
+            .then(function (res) {
                 phantom.dispose.bind(phantom)
                 return res;
             }, phantom.dispose.bind(phantom))
