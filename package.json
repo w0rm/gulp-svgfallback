@@ -29,8 +29,7 @@
   "dependencies": {
     "gulp-util": "^3.0.1",
     "lodash": "^3.9.1",
-    "phridge": "^1.1.0",
-    "when": "^3.7.3"
+    "phridge": "^2.0.0"
   },
   "devDependencies": {
     "gulp": "^3.8.10",
