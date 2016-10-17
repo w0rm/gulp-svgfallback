@@ -4,7 +4,6 @@ var gutil = require('gulp-util')
 var _ = require('lodash')
 var phridge = require('phridge')
 var fs = require('fs')
-var when = require('when')
 
 var SPRITE_TEMPLATE = path.join(__dirname, 'templates', 'sprite.html')
 
@@ -55,7 +54,6 @@ module.exports = function (options) {
       })
       .then(generateSprite)
       .then(function (sprite) {
-
         self.push(new gutil.File({
           path: fileName + '.png'
         , contents: new Buffer(sprite.img, 'base64')
@@ -67,7 +65,7 @@ module.exports = function (options) {
         })
 
       })
-      .done(
+      .then(
         function (css) {
           self.push(new gutil.File({
             path: fileName + '.css'
@@ -88,7 +86,7 @@ module.exports = function (options) {
 
 
 function renderTemplate (fileName, options) {
-  return when.promise(function (resolve, reject) {
+  return new Promise(function (resolve, reject) {
     fs.readFile(fileName, function (err, template) {
       if (err) return reject(err)
       try {
@@ -106,7 +104,10 @@ function generateSprite (opts) {
     .then(function (phantom) {
       return phantom
         .run(opts, phantomScript)
-        .finally(phantom.dispose.bind(phantom))
+            .then(function (res) {
+                phantom.dispose.bind(phantom)
+                return res;
+            }, phantom.dispose.bind(phantom))
     })
 }
 
