@@ -3,7 +3,7 @@ gulp-svgfallback [![Build Status](https://api.travis-ci.org/w0rm/gulp-svgfallbac
 
 <img align="right" width="130" height="285"
      title="Fallback Parachute"
-     src="https://github.com/w0rm/gulp-svgfallback/blob/master/fallback-parachute.png">
+     src="https://raw.githubusercontent.com/w0rm/gulp-svgfallback/master/fallback-parachute.png">
 
 Generate png sprite from svg sources.
 
