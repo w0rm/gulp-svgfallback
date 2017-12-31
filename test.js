@@ -2,7 +2,8 @@
 
 var svgfallback = require('./index')
 var assert = require('assert')
-var gutil = require('gulp-util')
+var Vinyl = require('vinyl')
+var PluginError = require('plugin-error')
 var imageSize = require('image-size')
 var _ = require('lodash')
 var sinon = require('sinon')
@@ -32,12 +33,12 @@ describe('gulp-svgfallback', function () {
 
     stream.on('data', files.push.bind(files))
 
-    stream.write(new gutil.File({
+    stream.write(new Vinyl({
       contents: new Buffer(CIRCLE)
     , path: 'src/icons/circle.svg'
     , base: 'src/icons'
     }))
-    stream.write(new gutil.File({
+    stream.write(new Vinyl({
       contents: new Buffer(SQUARE)
     , path: 'src2/icons2/square.svg'
     , base: 'src2/icons2'
@@ -62,12 +63,12 @@ describe('gulp-svgfallback', function () {
 
     stream.on('data', files.push.bind(files))
 
-    stream.write(new gutil.File({
+    stream.write(new Vinyl({
       contents: new Buffer(CIRCLE)
     , path: 'circle.svg'
     , base: '.'
     }))
-    stream.write(new gutil.File({
+    stream.write(new Vinyl({
       contents: new Buffer(SQUARE)
     , path: 'square.svg'
     , base: '.'
@@ -90,13 +91,13 @@ describe('gulp-svgfallback', function () {
       var stream = svgfallback()
 
       stream.on('error', function (error) {
-        assert.ok(error instanceof gutil.PluginError);
+        assert.ok(error instanceof PluginError);
         assert.equal(error.message, 'File name should be unique: circle')
         done()
       })
 
-      stream.write(new gutil.File({ contents: new Buffer('<svg></svg>'), path: 'circle.svg' }))
-      stream.write(new gutil.File({ contents: new Buffer('<svg></svg>'), path: 'circle.svg' }))
+      stream.write(new Vinyl({ contents: new Buffer('<svg></svg>'), path: 'circle.svg' }))
+      stream.write(new Vinyl({ contents: new Buffer('<svg></svg>'), path: 'circle.svg' }))
 
       stream.end()
 
@@ -126,10 +127,10 @@ describe('gulp-svgfallback', function () {
 
     var stream = svgfallback({ cssTemplate: 'missing-temaplate.css' })
 
-    stream.write(new gutil.File({ contents: new Buffer(CIRCLE), path: 'circle.svg' }))
+    stream.write(new Vinyl({ contents: new Buffer(CIRCLE), path: 'circle.svg' }))
 
     stream.on('error', function (err) {
-      assert.ok(err instanceof gutil.PluginError)
+      assert.ok(err instanceof PluginError)
       assert.equal(err.plugin, 'gulp-svgfallback')
       done()
     })
@@ -143,10 +144,10 @@ describe('gulp-svgfallback', function () {
 
     var stream = svgfallback({ cssTemplate: 'test/src/syntax-error.css' })
 
-    stream.write(new gutil.File({ contents: new Buffer(CIRCLE), path: 'circle.svg' }))
+    stream.write(new Vinyl({ contents: new Buffer(CIRCLE), path: 'circle.svg' }))
 
     stream.on('error', function (err) {
-      assert.ok(err instanceof gutil.PluginError)
+      assert.ok(err instanceof PluginError)
       assert.equal(err.plugin, 'gulp-svgfallback')
       done()
     })
@@ -164,7 +165,7 @@ describe('gulp-svgfallback', function () {
 
     for(var i = 0; i < 10; i++) {
       // Each svg is 40px size
-      stream.write(new gutil.File({
+      stream.write(new Vinyl({
         contents: new Buffer(CIRCLE)
       , path: 'file' + i + '.svg'
       , base: '.'
@@ -199,8 +200,8 @@ describe('gulp-svgfallback', function () {
 
     stream.on('data', function () {})
 
-    stream.write(new gutil.File({ contents: new Buffer(CIRCLE), path: 'circle.svg', base: '.' }))
-    stream.write(new gutil.File({ contents: new Buffer(SQUARE), path: 'square.svg', base: '.' }))
+    stream.write(new Vinyl({ contents: new Buffer(CIRCLE), path: 'circle.svg', base: '.' }))
+    stream.write(new Vinyl({ contents: new Buffer(SQUARE), path: 'square.svg', base: '.' }))
 
     stream.on('end', function () {
 
