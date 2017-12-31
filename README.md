@@ -164,6 +164,7 @@ gulp.task('svgfallback', function () {
 
 ## Changelog
 
+* 5.0.0 Remove gulp-util dep, drop node 0.12 support
 * 4.0.1 Update to PhantomJS 2, drop node 0.10 support
 * 3.0.2 Update direct dependencies
 * 3.0.1 Reduced dev dependencies
