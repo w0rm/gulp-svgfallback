@@ -1,6 +1,7 @@
 var path = require('path')
 var Stream = require('stream')
-var gutil = require('gulp-util')
+var PluginError = require('plugin-error')
+var Vinyl = require('vinyl')
 var _ = require('lodash')
 var phridge = require('phridge')
 var fs = require('fs')
@@ -20,7 +21,7 @@ module.exports = function (options) {
 
   stream._transform = function transform (file, encoding, cb) {
     if (file.isStream()) {
-      return cb(new gutil.PluginError('gulp-svgfallback', 'Streams are not supported!'))
+      return cb(new PluginError('gulp-svgfallback', 'Streams are not supported!'))
     }
 
     var name = path.basename(file.relative, path.extname(file.relative))
@@ -35,7 +36,7 @@ module.exports = function (options) {
     }
 
     if (name in svgs) {
-      return cb(new gutil.PluginError('gulp-svgfallback', 'File name should be unique: ' + name))
+      return cb(new PluginError('gulp-svgfallback', 'File name should be unique: ' + name))
     }
 
     svgs[name] = file.contents.toString()
@@ -54,7 +55,7 @@ module.exports = function (options) {
       })
       .then(generateSprite)
       .then(function (sprite) {
-        self.push(new gutil.File({
+        self.push(new Vinyl({
           path: fileName + '.png'
         , contents: new Buffer(sprite.img, 'base64')
         }))
@@ -67,7 +68,7 @@ module.exports = function (options) {
       })
       .then(
         function (css) {
-          self.push(new gutil.File({
+          self.push(new Vinyl({
             path: fileName + '.css'
           , contents: new Buffer(css)
           }))
@@ -75,7 +76,7 @@ module.exports = function (options) {
         }
       , function (err) {
           setImmediate(function () {
-            cb(new gutil.PluginError('gulp-svgfallback', err))
+            cb(new PluginError('gulp-svgfallback', err))
           })
         }
       )
