@@ -27,7 +27,7 @@
   },
   "homepage": "https://github.com/w0rm/gulp-svgfallback",
   "dependencies": {
-    "lodash": "^3.9.1",
+    "lodash": "^4.17.5",
     "phridge": "^2.0.0",
     "plugin-error": "^0.1.2",
     "vinyl": "^2.1.0"
